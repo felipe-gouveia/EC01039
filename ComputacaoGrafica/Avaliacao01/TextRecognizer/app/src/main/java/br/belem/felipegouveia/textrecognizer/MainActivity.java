@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     JavaCameraView javaCameraView;
     Mat mRgba, mGray, mByte;
     private Scalar CONTOUR_COLOR;
+    boolean isProcess = true;
 
     BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -56,9 +57,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},1);
@@ -116,7 +114,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mGray = inputFrame.gray();
 
         detectText();
-        /*CONTOUR_COLOR = new Scalar(255);
+        return mRgba;
+    }
+
+    private void detectText() {
+
+        CONTOUR_COLOR = new Scalar(255);
         MatOfKeyPoint keypoint = new MatOfKeyPoint();
         List<KeyPoint> listpoint = new ArrayList<KeyPoint>();
         KeyPoint kpoint = new KeyPoint();
@@ -181,15 +184,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                             CONTOUR_COLOR);
             }
 
-            return mRgba;
-        }*/
-
-        return mRgba;
-    }
-
-    private void detectText() {
-
-        MatOfKeyPoint keypoint = new MatOfKeyPoint();
+        }
+        /*MatOfKeyPoint keypoint = new MatOfKeyPoint();
         List<KeyPoint> listpoint;
         KeyPoint kpoint;
         Mat mask = Mat.zeros(mGray.size(), CvType.CV_8UC1);
@@ -249,6 +245,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             } else
                 Imgproc.rectangle(mRgba, rectan3.br(), rectan3.tl(),
                         CONTOUR_COLOR);
-        }
+        }*/
     }
 }
