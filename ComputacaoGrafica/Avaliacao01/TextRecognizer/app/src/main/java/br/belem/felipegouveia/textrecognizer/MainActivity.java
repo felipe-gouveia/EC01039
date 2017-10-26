@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     JavaCameraView javaCameraView;
     Mat mRgba, mGray, mByte, mIntermediateMat;
     private Scalar CONTOUR_COLOR;
-    private MyTessOCR mTessOCR;
     Bitmap bmp;
 
     BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTessOCR = new MyTessOCR(this);
 
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},1);
@@ -91,10 +89,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onResume(){
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
-            Log.i(TAG, "OpenCv problem");
+            Log.i(TAG, "OpenCv didn't initiate.");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_3_0, this, mLoaderCallback);
         } else {
-            Log.i(TAG, "OpenCV initiated success");
+            Log.i(TAG, "OpenCV initiated successfuly.");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
 
@@ -102,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-        //mIntermediateMat = new Mat();
         mRgba = new Mat(height, width, CvType.CV_8UC3);
         mByte = new Mat(height, width, CvType.CV_8UC1);
     }
@@ -175,22 +172,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
         for (int ind = 0; ind < contour2.size(); ind++) {
             rectan3 = Imgproc.boundingRect(contour2.get(ind));
+            rectan3 = Imgproc.boundingRect(contour2.get(ind));
+            if (rectan3.area() > 0.5 * imgsize || rectan3.area() < 100
+                    || rectan3.width / rectan3.height < 2) {
+                Mat roi = new Mat(morbyte, rectan3);
+                roi.setTo(zeos);
 
-            try {
-                Mat croppedPart;
-                croppedPart = mIntermediateMat.submat(rectan3);
-                bmp = Bitmap.createBitmap(croppedPart.width(), croppedPart.height(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(croppedPart, bmp);
-            } catch (Exception e) {
-                Log.d(TAG, "cropped part data error " + e.getMessage());
-            }
-            if (bmp != null) {
-                doOCR(bmp);
-            }
+            } else
+                Imgproc.rectangle(mRgba, rectan3.br(), rectan3.tl(),
+                        CONTOUR_COLOR);
         }
-    }
-
-    private void doOCR(final Bitmap bitmap) {
-        String text = mTessOCR.getOCRResult(bitmap);
     }
 }
