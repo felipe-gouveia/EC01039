@@ -2,6 +2,7 @@ package br.belem.felipegouveia.textrecognizer;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
@@ -33,9 +35,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = MainActivity.class.getSimpleName();
     JavaCameraView javaCameraView;
-    Mat mRgba, mGray, mByte;
+    Mat mRgba, mGray, mByte, mIntermediateMat;
     private Scalar CONTOUR_COLOR;
-    boolean isProcess = true;
+    private MyTessOCR mTessOCR;
+    Bitmap bmp;
 
     BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mTessOCR = new MyTessOCR(this);
 
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},1);
@@ -121,71 +125,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         CONTOUR_COLOR = new Scalar(255);
         MatOfKeyPoint keypoint = new MatOfKeyPoint();
-        List<KeyPoint> listpoint = new ArrayList<KeyPoint>();
-        KeyPoint kpoint = new KeyPoint();
-        Mat mask = Mat.zeros(mGray.size(), CvType.CV_8UC1);
-        int rectanx1;
-        int rectany1;
-        int rectanx2;
-        int rectany2;
-
-        //
-        Scalar zeos = new Scalar(0, 0, 0);
-        List<MatOfPoint> contour1 = new ArrayList<MatOfPoint>();
-        List<MatOfPoint> contour2 = new ArrayList<MatOfPoint>();
-        Mat kernel = new Mat(1, 50, CvType.CV_8UC1, Scalar.all(255));
-        Mat morbyte = new Mat();
-        Mat hierarchy = new Mat();
-
-        Rect rectan2 = new Rect();//
-        Rect rectan3 = new Rect();//
-        int imgsize = mRgba.height() * mRgba.width();
-        //
-        if (isProcess) {
-            FeatureDetector detector = FeatureDetector
-                    .create(FeatureDetector.MSER);
-            detector.detect(mGray, keypoint);
-            listpoint = keypoint.toList();
-            //
-            for (int ind = 0; ind < listpoint.size(); ind++) {
-                kpoint = listpoint.get(ind);
-                rectanx1 = (int) (kpoint.pt.x - 0.5 * kpoint.size);
-                rectany1 = (int) (kpoint.pt.y - 0.5 * kpoint.size);
-                // rectanx2 = (int) (kpoint.pt.x + 0.5 * kpoint.size);
-                // rectany2 = (int) (kpoint.pt.y + 0.5 * kpoint.size);
-                rectanx2 = (int) (kpoint.size);
-                rectany2 = (int) (kpoint.size);
-                if (rectanx1 <= 0)
-                    rectanx1 = 1;
-                if (rectany1 <= 0)
-                    rectany1 = 1;
-                if ((rectanx1 + rectanx2) > mGray.width())
-                    rectanx2 = mGray.width() - rectanx1;
-                if ((rectany1 + rectany2) > mGray.height())
-                    rectany2 = mGray.height() - rectany1;
-                Rect rectant = new Rect(rectanx1, rectany1, rectanx2, rectany2);
-                Mat roi = new Mat(mask, rectant);
-                roi.setTo(CONTOUR_COLOR);
-
-            }
-
-            Imgproc.morphologyEx(mask, morbyte, Imgproc.MORPH_DILATE, kernel);
-            Imgproc.findContours(morbyte, contour2, hierarchy,
-                    Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-            for (int ind = 0; ind < contour2.size(); ind++) {
-                rectan3 = Imgproc.boundingRect(contour2.get(ind));
-                if (rectan3.area() > 0.5 * imgsize || rectan3.area() < 100
-                        || rectan3.width / rectan3.height < 2) {
-                    Mat roi = new Mat(morbyte, rectan3);
-                    roi.setTo(zeos);
-
-                } else
-                    Imgproc.rectangle(mRgba, rectan3.br(), rectan3.tl(),
-                            CONTOUR_COLOR);
-            }
-
-        }
-        /*MatOfKeyPoint keypoint = new MatOfKeyPoint();
         List<KeyPoint> listpoint;
         KeyPoint kpoint;
         Mat mask = Mat.zeros(mGray.size(), CvType.CV_8UC1);
@@ -236,15 +175,22 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
         for (int ind = 0; ind < contour2.size(); ind++) {
             rectan3 = Imgproc.boundingRect(contour2.get(ind));
-            rectan3 = Imgproc.boundingRect(contour2.get(ind));
-            if (rectan3.area() > 0.5 * imgsize || rectan3.area() < 100
-                    || rectan3.width / rectan3.height < 2) {
-                Mat roi = new Mat(morbyte, rectan3);
-                roi.setTo(zeos);
 
-            } else
-                Imgproc.rectangle(mRgba, rectan3.br(), rectan3.tl(),
-                        CONTOUR_COLOR);
-        }*/
+            try {
+                Mat croppedPart;
+                croppedPart = mIntermediateMat.submat(rectan3);
+                bmp = Bitmap.createBitmap(croppedPart.width(), croppedPart.height(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(croppedPart, bmp);
+            } catch (Exception e) {
+                Log.d(TAG, "cropped part data error " + e.getMessage());
+            }
+            if (bmp != null) {
+                doOCR(bmp);
+            }
+        }
+    }
+
+    private void doOCR(final Bitmap bitmap) {
+        String text = mTessOCR.getOCRResult(bitmap);
     }
 }

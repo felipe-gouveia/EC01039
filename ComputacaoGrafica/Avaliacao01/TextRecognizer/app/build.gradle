@@ -10,6 +10,27 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        packagingOptions {
+            exclude "lib/arm64-v8a/libopencv_calib3d.a"
+            exclude "lib/arm64-v8a/libopencv_core.a"
+            exclude "lib/arm64-v8a/libopencv_dnn.a"
+            exclude "lib/arm64-v8a/libopencv_features2d.a"
+            exclude "lib/arm64-v8a/libopencv_flann.a"
+            exclude "lib/arm64-v8a/libopencv_highgui.a"
+            exclude "lib/arm64-v8a/libopencv_imgcodecs.a"
+            exclude "lib/arm64-v8a/libopencv_imgproc.a"
+            exclude "lib/arm64-v8a/libopencv_java3.so"
+            exclude "lib/arm64-v8a/ml.a"
+            exclude "lib/arm64-v8a/objdetect.a"
+            exclude "lib/arm64-v8a/photo.a"
+            exclude "lib/arm64-v8a/shape.a"
+            exclude "lib/arm64-v8a/stitching.a"
+            exclude "lib/arm64-v8a/superres.a"
+            exclude "lib/arm64-v8a/video.a"
+            exclude "lib/arm64-v8a/videoio.a"
+            exclude "lib/arm64-v8a/videostab.a"
+            
+        }
     }
     buildTypes {
         release {
@@ -28,5 +49,5 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile project(':openCVLibrary330')
-    //compile 'com.rmtheis:tess-two:8.0.0'
+    compile 'com.rmtheis:tess-two:8.0.0'
 }
