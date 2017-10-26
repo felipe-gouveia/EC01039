@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-
     private static final int INPUT_SIZE = 224;
     private static final int IMAGE_MEAN = 117;
     private static final float IMAGE_STD = 1;
@@ -157,16 +156,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
 
-        Size sizeGray = mRgba.size();
-        int rowss = (int) sizeGray.height;
-        int colss = (int) sizeGray.width;
-
-        Mat tmp =  new Mat(colss, rowss, CvType.CV_8UC3);
-
         mBitmap = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mRgba, mBitmap);
-
-        //mBitmap = BitmapFactory.decodeByteArray(mBitmap, 0, mBitmap.width);
 
         mBitmap = Bitmap.createScaledBitmap(mBitmap, INPUT_SIZE, INPUT_SIZE, false);
 
