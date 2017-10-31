@@ -19,9 +19,11 @@ package br.belem.felipegouveia.realtimeobjectsrecognizer;
         import org.opencv.android.LoaderCallbackInterface;
         import org.opencv.android.OpenCVLoader;
         import org.opencv.android.Utils;
+        import org.opencv.core.Core;
         import org.opencv.core.CvType;
         import org.opencv.core.Mat;
         import org.opencv.core.Size;
+        import org.opencv.imgproc.Imgproc;
 
         import java.util.List;
         import java.util.concurrent.Executor;
@@ -154,10 +156,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
-        mGray = inputFrame.gray();
+
+        // Rotacionando imagem
+        Mat mRgbaT = mRgba.t();
+        Core.flip(mRgba.t(), mRgbaT, 1);
+        Imgproc.resize(mRgbaT, mRgbaT, mRgba.size());
 
         mBitmap = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(mRgba, mBitmap);
+        Utils.matToBitmap(mRgbaT, mBitmap);
 
         mBitmap = Bitmap.createScaledBitmap(mBitmap, INPUT_SIZE, INPUT_SIZE, false);
 
@@ -170,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 Log.i(TAG, results.toString());
             }
         });
-
-        return mRgba;
+        mRgba.release();
+        return mRgbaT;
     }
 }
