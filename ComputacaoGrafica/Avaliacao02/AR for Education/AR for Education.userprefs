@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="AR for Education.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\SamplesResources\ImageTargets\Scripts\ModelSwap.cs">
+    <Files>
+      <File FileName="Assets\SamplesResources\ImageTargets\Scripts\ModelSwap.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
