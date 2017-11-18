@@ -7,13 +7,12 @@ image_gray = double(image_gray);
 gray_min = double(min(min(image_gray)));
 gray_max = double(max(max(image_gray)));
 
-% Determine the amount to "shift/move" pixel intensity values by
-%shift_val = gray_min - gamma_min;
-
 % Valor de esccala para ajuste antes de implementar a correção gama
 escala = double(1)/(gray_max-gray_min);
 
 % Diminuimos a escala dos pixels para realizar a correção gamma
+
+
 for rows = 1:i
  for columns = 1:j
  image_gray(rows, columns)=(image_gray(rows, columns))*double(escala);

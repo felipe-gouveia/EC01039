@@ -53,23 +53,23 @@ g2 = gamma_correction(image_gray, 0.5);
 % Gamma = 1.5
 figure('Name','Imagem Original x Imagem Transformada com Gamma = 1.5'), imshowpair(image_gray, g1, 'montage');
 figure('Name','Histogramas da Imagem Original x Imagem Transformada com Gamma = 1.5');
-subplot(1,2,1), imhist(image_gray), title('Histograma da Imagem Original');
-subplot(1,2,2), imhist(g1), title('Histograma da Transformação de Intensidade com Gamma = 1.5');
+subplot(1,2,1), histogram(image_gray), title('Histograma da Imagem Original');
+subplot(1,2,2), histogram(g1), title('Histograma da Transformação de Intensidade com Gamma = 1.5');
 imwrite(g1, 'C:\Users\Felipe\Desktop\tarefa02\transf_int_gamma15.jpg', 'jpg');
 
 % Gamma = 0.5
 figure('Name','Imagem Original x Imagem Transformada com Gamma = 0.5'), imshowpair(image_gray, g2, 'montage');
 figure('Name','Histogramas da Imagem Original x Imagem Transformada com Gamma = 0.5');
-subplot(1,2,1), imhist(image_gray), title('Histograma da Imagem Original');
-subplot(1,2,2), imhist(g2), title('Histograma da Transformação de Intensidade com Gamma = 0.5');
+subplot(1,2,1), histogram(image_gray), title('Histograma da Imagem Original');
+subplot(1,2,2), histogram(g2), title('Histograma da Transformação de Intensidade com Gamma = 0.5');
 imwrite(g2, 'C:\Users\Felipe\Desktop\tarefa02\transf_int_gamma05.jpg', 'jpg');
 
 % Funções de Mapeamento?
 figure;
-subplot(1,2,1);plot(( 0:0.01:255).^1.5);axis tight;
+subplot(1,2,1);plot(( 0:1:255).^1.5);axis tight;
 legend('Para Gamma = 1.5');
 
-subplot(1,2,2);plot(( 0:0.01:255).^0.5);axis tight;
+subplot(1,2,2);plot(( 0:1:255).^0.5);axis tight;
 legend('Para Gamma = 0.5');
 
 fprintf('Programa pausado. Pressione ENTER para continuar para próxima questão.\n');
@@ -77,12 +77,12 @@ pause;
 
 %% ==================== Questão 4: Implementar uma rotina para Equalização de Histogramas  ===================
 fprintf('Questão 4: Implementar uma rotina para Equalização de Histogramas.\n');
-imagem_equalizada = histeq(image_gray);
+imagem_equalizada = equalize_histogram(image_gray);
 
 figure('Name','Imagem Original x Imagem Equalizada'), imshowpair(image_gray,imagem_equalizada,'montage');
 figure('Name','Histogramas da Imagem Original x Imagem Equalizada');
-subplot(1,2,1), imhist(image_gray), title('Histograma da Imagem Original');
-subplot(1,2,2), imhist(imagem_equalizada), title('Histograma da Imagem Equalizada');
+subplot(1,2,1), histogram(image_gray), title('Histograma da Imagem Original');
+subplot(1,2,2), histogram(imagem_equalizada), title('Histograma da Imagem Equalizada');
 
 fprintf('Tarefa 02 concluída.\n');
 
